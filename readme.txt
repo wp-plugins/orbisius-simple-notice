@@ -21,6 +21,8 @@ This plugin allows you to show a simple notice to alert your users about server 
 = Features / Benefits =
 * Enter text an the message will be shown to your users.
 * For logged in users the notice will be shifted by 28px (because WP admin bar is obstructing the notice)
+* Rich text editor to enter notice text
+* Use nice color pickers to select the colors for notice text, background and link color (if any).
 * Supports text and HTML
 
 == Demo ==
@@ -59,6 +61,11 @@ If you don't want to give us credit :( add this line to your functions.php
 add_filter('orbisius_simple_notice_filter_powered_by', '__return_false', 10);
 
 == Changelog ==
+
+= 1.0.1 =
+* Added a color picker for text, text background color and for links.
+* Added preview in the settings page.
+* Added uninstall.php to cleanup settings.
 
 = 1.0.0 =
 * Initial release
