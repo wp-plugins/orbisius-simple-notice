@@ -394,8 +394,13 @@ function orbisius_simple_notice_options_page() {
                             <div class="inside">
                                 Donations help us dedicate more resources to improve this and create new plugins.
 
-                                <br/><a href='http://orbisius.com/page/donate/?utm_source=orbisius-simple-notice&utm_medium=plugin-settings-about&utm_campaign=plugin-update'
+                                <br/>
+                                <!--<a href='http://orbisius.com/page/donate/?utm_source=orbisius-simple-notice&utm_medium=plugin-settings-about&utm_campaign=plugin-update'
+                                   target="_blank" class="button-primary">Donate</a>-->
+
+                                    <a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7APYDVPBCSY9A'
                                    target="_blank" class="button-primary">Donate</a>
+
                                    | <a href='http://orbisius.com/page/why-donate/?utm_source=orbisius-simple-notice&utm_medium=plugin-settings-about&utm_campaign=plugin-update'
                                    target="_blank">Why Donate</a>
                             </div> <!-- .inside -->
