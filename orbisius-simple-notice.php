@@ -134,11 +134,11 @@ function orbisius_simple_notice_inject_notice($live_site = 1) {
         "padding:3px",
         "text-align:center",
         "width:100%",
-        "z-index:99999",
+        //"z-index:99999",
         "font-family:arial",
     );
 
-    if (!empty($live_site)) {
+    if (0&&!empty($live_site)) {
         $inline_css_arr[] = "top:$top_pos";
         $inline_css_arr[] = "left:$left_pos";
         $inline_css_arr[] = "position:fixed";
@@ -163,6 +163,11 @@ function orbisius_simple_notice_inject_notice($live_site = 1) {
 }
 $link_color_css
 </style>
+<script>
+    jQuery(document).ready(function ($) {
+        jQuery('#orbisius_simple_notice_container').prependTo('body');
+    });
+</script>
 <div id="orbisius_simple_notice_container" class="orbisius_simple_notice_container">
     <div id="orbisius_simple_notice" class="orbisius_simple_notice">
         $notice
@@ -277,7 +282,7 @@ function orbisius_simple_notice_options_page() {
                                                 <br/>
                                                 <label for="radio2">
                                                     <input type="radio" id="radio2" name="orbisius_simple_notice_options[status]"
-                                                           value="0" <?php echo!empty($opts['status']) ? '' : 'checked="checked"'; ?> /> Disabled
+                                                           value="0" <?php echo !empty($opts['status']) ? '' : 'checked="checked"'; ?> /> Disabled
                                                 </label>
                                             </td>
                                         </tr>
@@ -306,6 +311,8 @@ function orbisius_simple_notice_options_page() {
                                                     <input type="text" id="orbisius_simple_notice_options_text_color" size="7"
                                                            name="orbisius_simple_notice_options[text_color]"
                                                            value="<?php echo esc_attr($opts['text_color']); ?>" />
+
+                                                    <div id="text_color_picker"></div> <!-- Used for old WP color picker WP < 3.5 -->
                                                 </label>
                                                 <p>Once you open the color picker, you will need to click outside of it to close it</p>
                                             </td>
@@ -317,6 +324,7 @@ function orbisius_simple_notice_options_page() {
                                                     <input type="text" id="orbisius_simple_notice_options_text_bg_color" size="7"
                                                            name="orbisius_simple_notice_options[text_bg_color]"
                                                            value="<?php echo esc_attr($opts['text_bg_color']); ?>" />
+                                                    <div id="text_bg_color_picker"></div>
                                                 </label>
                                                 <p>Once you open the color picker, you will need to click outside of it to close it</p>
                                             </td>
@@ -328,6 +336,20 @@ function orbisius_simple_notice_options_page() {
                                                     <input type="text" id="orbisius_simple_notice_options_link_color" size="7"
                                                            name="orbisius_simple_notice_options[link_color]"
                                                            value="<?php echo esc_attr($opts['link_color']); ?>" />
+                                                    <div id="link_color_picker"></div>
+                                                </label>
+                                                <p>Use this if links don't look good on a selected background.
+                                                <br/>Once you open the color picker, you will need to click outside of it to close it</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Do not block content (doesn't stay on top).</th>
+                                            <td>
+                                                <label for="orbisius_simple_notice_options_link_color">
+                                                    <input type="checkbox" id="orbisius_simple_notice_options_link_color" size="7"
+                                                           name="orbisius_simple_notice_options[link_color]"
+                                                           value="<?php echo esc_attr($opts['link_color']); ?>" />
+                                                    <div id="link_color_picker"></div>
                                                 </label>
                                                 <p>Use this if links don't look good on a selected background.
                                                 <br/>Once you open the color picker, you will need to click outside of it to close it</p>
@@ -525,14 +547,6 @@ function orbisius_simple_notice_generate_newsletter_box() {
         $plugin_data = orbisius_simple_notice_get_plugin_data();
         $plugin_name = $plugin_data['name'];
     ?>
-    <!-- v.1.0.1 -->
-<style>
-    .app_mailing_list_box00 {
-        margin: 0;
-        padding:5px;
-        background-color: #ffffcc;
-    }
-</style>
 
 <table>
     <tr>

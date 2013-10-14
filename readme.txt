@@ -1,6 +1,6 @@
 === Orbisius Simple Notice ===
 
-Contributors: lordspace
+Contributors: lordspace,orbisius
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7APYDVPBCSY9A
 Tags: wp,orbisius,notice,alert,hellobar,hello bar,beforesite, heads up, heads up bar, headsup, headsupbar, notification, notification bar, popup, Toolbar
 Requires at least: 2.6
@@ -61,6 +61,9 @@ If you don't want to give us credit :( add this line to your functions.php
 add_filter('orbisius_simple_notice_filter_powered_by', '__return_false', 10);
 
 == Changelog ==
+
+= 1.0.2 =
+* Added the old color picker for WordPress installs older than 3.5
 
 = 1.0.1 =
 * Added a color picker for text, text background color and for links.
