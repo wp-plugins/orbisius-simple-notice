@@ -46,7 +46,8 @@ n/a
 
 == Screenshots ==
 1. The Notice shown by the plugin
-2. Plugin's Settings Page
+2. Plugin's Settings Page (part 1)
+2. Plugin's Settings Page (part 2)
 
 == Installation ==
 
@@ -71,6 +72,7 @@ add_filter('orbisius_simple_notice_filter_powered_by', '__return_false', 10);
 * Added a little i icon on the left as a powered by option + option to enable/disable it.
 * Added an option for the user to select to show the notice on all pages or on the home page only
 * The notice can be closed/dismissed
+* Updated screenshots
 
 = 1.0.1 =
 * Added a color picker for text, text background color and for links.
