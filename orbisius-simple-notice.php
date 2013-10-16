@@ -27,25 +27,9 @@
 
 // Set up plugin
 add_action('init', 'orbisius_simple_notice_init');
+add_action('wp_footer', 'orbisius_simple_notice_inject_notice', 50, 0); // be the last in the footer
 add_action('admin_init', 'orbisius_simple_notice_admin_init');
-
 add_action('admin_menu', 'orbisius_simple_notice_setup_admin');
-//add_action( 'wp_head', 'orbisius_simple_notice_config');
-add_action('wp_print_scripts', 'orbisius_simple_notice_config', 50);
-add_action('wp_footer', 'orbisius_simple_notice_inject_notice', 10, 0); // be the last in the footer
-
-/**
- * Outputs directly to the browser a json config file which is used by main.js
- * This contains the ajax endpoint & page id so we can include it in the feedback.
- */
-function orbisius_simple_notice_config() {
-    $queried_object = get_queried_object();
-
-    $plugin_ajax_url = admin_url('admin-ajax.php'); // not always defined on the public side.
-    $id = empty($queried_object->ID) ? 0 : $queried_object->ID;
-
-    echo "\n<script> var orbisius_simple_notice_config = { plugin_ajax_url: '$plugin_ajax_url', page_id : $id };</script>\n";
-}
 
 /**
  * Adds the action link to settings. That's from Plugins. It is a nice thing.
@@ -103,15 +87,18 @@ function orbisius_simple_notice_inject_notice($live_site = 1) {
     $opts = orbisius_simple_notice_get_options();
     $data = orbisius_simple_notice_get_plugin_data();
 
-    // The user doesn't want to show the form.
-    if (empty($opts['status'])) {
+    // The user doesn't want to show the notice.
+    // This applies only for the live site.
+    if (empty($opts['status']) && !empty($live_site)) {
         echo "\n<!-- {$data['name']} | {$data['url']} : is disabled. Skipping rendering. -->\n";
         return;
     }
 
-    $xyz = "<a href='{$data['url']}' target='_blank'>{$data['name']}</a>";
-
-    $powered_by_line = "<div class='powered_by'>Powered by $xyz</div>";
+    $powered_by_line = 
+            "<div class='orbisius_simple_notice_powered_by'>"
+            . "<a title='Powered by {$data['name']}. Free hellobar WordPress Plugin, hellobar,alert notice,notice bar'"
+            . " href='{$data['url']}' class='little_info' target='_blank'>i</a>"
+            . "</div>\n";
 
     // in case if somebody wants to get rid if the feedback link
     $powered_by_line = apply_filters('orbisius_simple_notice_filter_powered_by', $powered_by_line);
@@ -138,11 +125,37 @@ function orbisius_simple_notice_inject_notice($live_site = 1) {
         "font-family:arial",
     );
 
-    if (0&&!empty($live_site)) {
-        $inline_css_arr[] = "top:$top_pos";
-        $inline_css_arr[] = "left:$left_pos";
-        $inline_css_arr[] = "position:fixed";
+    $js_first = '';
+
+    if (!empty($live_site)) {
+        if ($opts['show_notice_method'] == 'on_top') {
+            $inline_css_arr[] = "top:$top_pos";
+            $inline_css_arr[] = "left:$left_pos";
+            $inline_css_arr[] = "position:fixed";
+        } else {
+            $js_first .= <<<FORM_EOF
+<script>
+    jQuery(document).ready(function ($) {
+        jQuery('#orbisius_simple_notice_container').prependTo('body'); // .css('postion', '')
+    });
+</script>
+FORM_EOF;
+        }
     }
+
+    $js_first .= <<<FORM_EOF
+<script>
+    jQuery(document).ready(function ($) {
+        jQuery('#orbisius_simple_notice_container .little_info').hover(function() {
+            jQuery('.orbisius_simple_notice_powered_by').show();
+        }, function() {
+            setTimeOut(function () {
+                jQuery('.orbisius_simple_notice_powered_by').hide();
+            }, 1000);
+        });
+    });
+</script>
+FORM_EOF;
 
     $link_color_css = '';
     $inline_css = join(";\n", $inline_css_arr);
@@ -154,27 +167,40 @@ function orbisius_simple_notice_inject_notice($live_site = 1) {
                 color: $link_color;
             }\n";
     }
-    
+
     $form_buff = <<<FORM_EOF
 <!-- orbisius_simple_notice : -->
 <style>
 .orbisius_simple_notice_container .orbisius_simple_notice {
     $inline_css
 }
+
 $link_color_css
+
+.orbisius_simple_notice_powered_by_container {
+    float:left;
+    text-decoration:none;
+}
+
+.orbisius_simple_notice_powered_by_container .little_info {
+    text-decoration:none;
+    display:block-inline;
+    padding:3px 3px;
+}
 </style>
-<script>
-    jQuery(document).ready(function ($) {
-        jQuery('#orbisius_simple_notice_container').prependTo('body');
-    });
-</script>
+$js_first
 <div id="orbisius_simple_notice_container" class="orbisius_simple_notice_container">
     <div id="orbisius_simple_notice" class="orbisius_simple_notice">
+        <span class='orbisius_simple_notice_powered_by_container'>
+            $powered_by_line
+        </span>
         $notice
     </div> <!-- /orbisius_simple_notice -->
 </div> <!-- /orbisius_simple_notice_container -->
 <!-- /orbisius_simple_notice -->
 FORM_EOF;
+
+//show_notice_method
 
     echo $form_buff;
 }
@@ -227,6 +253,7 @@ function orbisius_simple_notice_get_options() {
     $defaults = array(
         'status' => 0,
         'show_in_admin' => 0,
+        'show_notice_method' => 'on_top',
         'text_color' => '#555',
         'text_bg_color' => '#B4CFD3',
         'link_color' => '',
@@ -249,13 +276,12 @@ function orbisius_simple_notice_get_options() {
  */
 function orbisius_simple_notice_options_page() {
     $opts = orbisius_simple_notice_get_options();
-
     ?>
     <div id="orbisius_simple_notice_admin_wrapper" class="wrap orbisius_simple_notice_admin_wrapper">
         <h2>Orbisius Simple Notice</h2>
-<p>
-                                    This plugin allows you to show a simple notice to alert your users about server maintenance, new product launches etc.
-                                </p>
+        <p>
+            This plugin allows you to show a simple notice to alert your users about server maintenance, new product launches etc.
+        </p>
 
         <div id="poststuff">
 
@@ -270,26 +296,26 @@ function orbisius_simple_notice_options_page() {
                             <h3><span>Settings</span></h3>
                             <div class="inside">
                                 <form method="post" action="options.php">
-    <?php settings_fields('orbisius_simple_notice_settings'); ?>
+                                    <?php settings_fields('orbisius_simple_notice_settings'); ?>
                                     <table class="form-table">
                                         <tr valign="top">
                                             <th scope="row">Show Notice</th>
                                             <td>
-                                                <label for="radio1">
-                                                    <input type="radio" id="radio1" name="orbisius_simple_notice_options[status]"
+                                                <label for="orbisius_simple_notice_options_radio1">
+                                                    <input type="radio" id="orbisius_simple_notice_options_radio1" name="orbisius_simple_notice_options[status]"
                                                            value="1" <?php echo empty($opts['status']) ? '' : 'checked="checked"'; ?> /> Enabled
                                                 </label>
                                                 <br/>
-                                                <label for="radio2">
-                                                    <input type="radio" id="radio2" name="orbisius_simple_notice_options[status]"
-                                                           value="0" <?php echo !empty($opts['status']) ? '' : 'checked="checked"'; ?> /> Disabled
+                                                <label for="orbisius_simple_notice_options_radio2">
+                                                    <input type="radio" id="orbisius_simple_notice_options_radio2" name="orbisius_simple_notice_options[status]"
+                                                           value="0" <?php echo!empty($opts['status']) ? '' : 'checked="checked"'; ?> /> Disabled
                                                 </label>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Notice</th>
                                             <td>
-    <?php if (1) : ?>
+                                                <?php if (1) : ?>
                                                     <?php
                                                     wp_editor($opts['notice'], "orbisius_simple_notice_options[notice]", array('teeny' => true, 'media_buttons' => false, 'textarea_rows' => 2));
                                                     ?>
@@ -297,11 +323,27 @@ function orbisius_simple_notice_options_page() {
                                                     <input type="text" id="orbisius_simple_notice_options_notice" class="widefat"
                                                            name="orbisius_simple_notice_options[notice]"
                                                            value="<?php echo esc_attr($opts['notice']); ?>" />
-    <?php endif; ?>
+                                                       <?php endif; ?>
                                                 <p>
                                                     Example: We are going to be doing server maintenance at 9pm today.
                                                     <br/>Example: We have just launched a new product ...
                                                 </p>
+                                            </td>
+                                        </tr>
+                                        <tr valign="top">
+                                            <th scope="row">How to Show the Notice Text</th>
+                                            <td>
+                                                <label for="show_notice_method_radio1">
+                                                    <input type="radio" id="show_notice_method_radio1" name="orbisius_simple_notice_options[show_notice_method]"
+                                                           value='on_top' <?php checked('on_top', $opts['show_notice_method']); ?> /> On top of existing content
+                                                    <br/><small>It will be added on top of all content (with higher z-index value)</small>
+                                                </label>
+                                                <br/>
+                                                <label for="show_notice_method_radio2">
+                                                    <input type="radio" id="show_notice_method_radio2" name="orbisius_simple_notice_options[show_notice_method]"
+                                                           value='push_down' <?php checked('push_down', $opts['show_notice_method']); ?> /> Push down existing content
+                                                    <br/><small>It will be added as first element in the &lt;body&gt; tag</small>
+                                                </label>
                                             </td>
                                         </tr>
                                         <tr>
@@ -339,44 +381,33 @@ function orbisius_simple_notice_options_page() {
                                                     <div id="link_color_picker"></div>
                                                 </label>
                                                 <p>Use this if links don't look good on a selected background.
-                                                <br/>Once you open the color picker, you will need to click outside of it to close it</p>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">Do not block content (doesn't stay on top).</th>
-                                            <td>
-                                                <label for="orbisius_simple_notice_options_link_color">
-                                                    <input type="checkbox" id="orbisius_simple_notice_options_link_color" size="7"
-                                                           name="orbisius_simple_notice_options[link_color]"
-                                                           value="<?php echo esc_attr($opts['link_color']); ?>" />
-                                                    <div id="link_color_picker"></div>
-                                                </label>
-                                                <p>Use this if links don't look good on a selected background.
-                                                <br/>Once you open the color picker, you will need to click outside of it to close it</p>
+                                                    <br/>Once you open the color picker, you will need to click outside of it to close it</p>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th scope="row">Preview </th>
                                             <td>
-    <?php echo orbisius_simple_notice_inject_notice(0); ?>
+                                                <?php echo orbisius_simple_notice_inject_notice(0); ?>
                                                 <div>Save changes to see a new preview</div>
                                             </td>
                                         </tr>
-    <?php if (has_action('orbisius_simple_notice_ext_action_render_settings')) : ?>
-                                            <tr valign="top">
-                                                <th scope="row"><strong>Extensions (see list)</strong></th>
-                                                <td colspan="1">
-                                                </td>
-                                            </tr>
-        <?php do_action('orbisius_simple_notice_ext_action_render_settings', $opts, $settings_key); ?>
-                                        <?php else : ?>
-                                            <tr valign="top">
-                                                <!--<th scope="row">Extension Name</th>-->
-                                                <td colspan="2">
-                                                    No extensions found.
-                                                </td>
-                                            </tr>
-    <?php endif; ?>
+                                        <?php if (0) : ?>
+                                            <?php if (has_action('orbisius_simple_notice_ext_action_render_settings')) : ?>
+                                                <tr valign="top">
+                                                    <th scope="row"><strong>Extensions (see list)</strong></th>
+                                                    <td colspan="1">
+                                                    </td>
+                                                </tr>
+                                                <?php do_action('orbisius_simple_notice_ext_action_render_settings', $opts, $settings_key); ?>
+                                            <?php else : ?>
+                                                <tr valign="top">
+                                                    <!--<th scope="row">Extension Name</th>-->
+                                                    <td colspan="2">
+                                                        No extensions found.
+                                                    </td>
+                                                </tr>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
                                     </table>
 
                                     <p class="submit">
@@ -398,9 +429,9 @@ function orbisius_simple_notice_options_page() {
                             <h3><span>Free Quote | Hire Us</span></h3>
                             <div class="inside">
                                 Do you need any Programming (web/mobile app) or WordPress work (custom themes/plugins, speed/security improvements).
-                                
+
                                 <br/><a href='http://orbisius.com/page/free-quote/?utm_source=orbisius-simple-notice&utm_medium=plugin-settings-about&utm_campaign=plugin-update'
-                                   target="_blank" class="button-primary">Get a Free Quote</a>
+                                        target="_blank" class="button-primary">Get a Free Quote</a>
                             </div> <!-- .inside -->
                         </div> <!-- .postbox -->
 
@@ -420,21 +451,21 @@ function orbisius_simple_notice_options_page() {
                                 <!--<a href='http://orbisius.com/page/donate/?utm_source=orbisius-simple-notice&utm_medium=plugin-settings-about&utm_campaign=plugin-update'
                                    target="_blank" class="button-primary">Donate</a>-->
 
-                                    <a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7APYDVPBCSY9A'
+                                <a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7APYDVPBCSY9A'
                                    target="_blank" class="button-primary">Donate</a>
 
-                                   | <a href='http://orbisius.com/page/why-donate/?utm_source=orbisius-simple-notice&utm_medium=plugin-settings-about&utm_campaign=plugin-update'
-                                   target="_blank">Why Donate</a>
+                                | <a href='http://orbisius.com/page/why-donate/?utm_source=orbisius-simple-notice&utm_medium=plugin-settings-about&utm_campaign=plugin-update'
+                                     target="_blank">Why Donate</a>
                             </div> <!-- .inside -->
                         </div> <!-- .postbox -->
 
                         <div class="postbox">
                             <h3><span>Want to see more products of ours? </span></h3>
                             <div class="inside">
-                            <p>
-                                Go to <a href="http://club.orbisius.com/products/" target="_blank"
-                                         title="Opens a page with the pugins we developed. [New Window/Tab]">http://club.orbisius.com/products/</a>.
-                            </p>
+                                <p>
+                                    Go to <a href="http://club.orbisius.com/products/" target="_blank"
+                                             title="Opens a page with the pugins we developed. [New Window/Tab]">http://club.orbisius.com/products/</a>.
+                                </p>
                             </div> <!-- .inside -->
                         </div> <!-- .postbox -->
 
@@ -452,15 +483,15 @@ function orbisius_simple_notice_options_page() {
                                 <p>
                                     <a href="http://slavi.biz/linkedin" target="_blank" title="Click to see Slavi's linkedin profile. Opens in a new tab/window">
                                         <img width="64" height="64" class="avatar avatar-64 photo" alt="" style="float: left;padding-right: 3px;"
-                                         src="http://1.gravatar.com/avatar/fd5bd959efce7d8c5c40518276bb3998?s=64&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D64&amp;r=G" /></a>
+                                             src="http://1.gravatar.com/avatar/fd5bd959efce7d8c5c40518276bb3998?s=64&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D64&amp;r=G" /></a>
 
                                     This plugin was created by Svetoslav Marinov (Slavi),
                                     Founder of <a href="http://orbisius.com/?utm_source=orbisius-simple-notice&utm_medium=plugin-settings-about&utm_campaign=plugin-update" target="_blank">orbisius.com</a>.
-                                     Connect with him on <a href="http://slavi.biz/linkedin" target="_blank"
+                                    Connect with him on <a href="http://slavi.biz/linkedin" target="_blank"
                                                            title="Click to see Slavi's linkedin profile. Opens in a new tab/window">Linkedin</a>
                                     and
                                     <a href="http://slavi.biz/twitter" target="_blank"
-                                                           title="Click to see Slavi's twitter profile. Opens in a new tab/window">Twitter</a>.
+                                       title="Click to see Slavi's twitter profile. Opens in a new tab/window">Twitter</a>.
                                 </p>
                             </div> <!-- .inside -->
                         </div> <!-- .postbox -->
@@ -477,25 +508,25 @@ function orbisius_simple_notice_options_page() {
         <h2>Extensions</h2>
         <p>Extensions allow you to add an extra functionality to this plugin.</p>
         <div>
-    <?php
-    if (!has_action('orbisius_simple_notice_ext_action_extension_list')) {
-        echo "No extensions have been installed.";
-    } else {
-        echo "The following extensions have been found.<br/><ul>";
-        do_action('orbisius_simple_notice_ext_action_extension_list');
-        echo "</ul>";
-    }
-    ?>
+            <?php
+            if (!has_action('orbisius_simple_notice_ext_action_extension_list')) {
+                echo "No extensions have been installed.";
+            } else {
+                echo "The following extensions have been found.<br/><ul>";
+                do_action('orbisius_simple_notice_ext_action_extension_list');
+                echo "</ul>";
+            }
+            ?>
         </div>
 
         <!-- share -->
-    <?php
-    $plugin_data = orbisius_simple_notice_get_plugin_data();
+        <?php
+        $plugin_data = orbisius_simple_notice_get_plugin_data();
 
-    $app_link = urlencode($plugin_data['url']);
-    $app_title = urlencode($plugin_data['name']);
-    $app_descr = urlencode($plugin_data['description']);
-    ?>
+        $app_link = urlencode($plugin_data['url']);
+        $app_title = urlencode($plugin_data['name']);
+        $app_descr = urlencode($plugin_data['description']);
+        ?>
 
         <h2>Share</h2>
         <p>
@@ -528,7 +559,7 @@ function orbisius_simple_notice_options_page() {
         <!-- AddThis Button END part2 -->
     </p>
     <!-- /share -->
-    
+
     <?php
     $plugin_slug = basename(__FILE__);
     $plugin_slug = str_replace('.php', '', $plugin_slug);
@@ -541,49 +572,49 @@ function orbisius_simple_notice_options_page() {
 }
 
 function orbisius_simple_notice_generate_newsletter_box() {
-        $current_user = wp_get_current_user();
-        $email = empty($current_user->user_email) ? '' : $current_user->user_email;
+    $current_user = wp_get_current_user();
+    $email = empty($current_user->user_email) ? '' : $current_user->user_email;
 
-        $plugin_data = orbisius_simple_notice_get_plugin_data();
-        $plugin_name = $plugin_data['name'];
+    $plugin_data = orbisius_simple_notice_get_plugin_data();
+    $plugin_name = $plugin_data['name'];
     ?>
 
-<table>
-    <tr>
-        <td valign="top">
-            <div id='app-plugin-notice' class='app_mailing_list_box' width="100%">
-                <!-- Begin MailChimp Signup Form -->
-                <div id="mc_embed_signup">
-                    <form action="http://orbisius.us2.list-manage.com/subscribe/post?u=005070a78d0e52a7b567e96df&amp;id=1b83cd2093" method="post"
-                          id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank">
-                        <input type="hidden" value="<?php echo esc_attr($plugin_name);?>" name="SRC" id="mce-SRC" />
-                        <input type="hidden" value="<?php echo esc_attr($plugin_name);?>" name="MERGE3" id="mce-MERGE3" />
+    <table>
+        <tr>
+            <td valign="top">
+                <div id='app-plugin-notice' class='app_mailing_list_box' width="100%">
+                    <!-- Begin MailChimp Signup Form -->
+                    <div id="mc_embed_signup">
+                        <form action="http://orbisius.us2.list-manage.com/subscribe/post?u=005070a78d0e52a7b567e96df&amp;id=1b83cd2093" method="post"
+                              id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank">
+                            <input type="hidden" value="<?php echo esc_attr($plugin_name); ?>" name="SRC" id="mce-SRC" />
+                            <input type="hidden" value="<?php echo esc_attr($plugin_name); ?>" name="MERGE3" id="mce-MERGE3" />
 
-                        <p>Join our newsletter and we will be notify you when we release cool plugins.</p>
-                        <div class="mc-field-group">
-                            <label for="mce-EMAIL">Email <span class="app_asterisk">*</span>
+                            <p>Join our newsletter and we will be notify you when we release cool plugins.</p>
+                            <div class="mc-field-group">
+                                <label for="mce-EMAIL">Email <span class="app_asterisk">*</span>
                                 </label>
-                            <input type="email" value="<?php echo esc_attr($email);?>" name="EMAIL" class="required email" id="mce-EMAIL" />
-                        </div>
-                        <div id="mce-responses" class="clear">
-                            <div class="response" id="mce-error-response" style="display:none"></div>
-                            <div class="response" id="mce-success-response" style="display:none"></div>
-                        </div>
-                        <div class="clear"><input type="submit" value="Join" name="subscribe" id="mc-embedded-subscribe" class="button button-primary"></div>
-                    </form>
+                                <input type="email" value="<?php echo esc_attr($email); ?>" name="EMAIL" class="required email" id="mce-EMAIL" />
+                            </div>
+                            <div id="mce-responses" class="clear">
+                                <div class="response" id="mce-error-response" style="display:none"></div>
+                                <div class="response" id="mce-success-response" style="display:none"></div>
+                            </div>
+                            <div class="clear"><input type="submit" value="Join" name="subscribe" id="mc-embedded-subscribe" class="button button-primary"></div>
+                        </form>
+                    </div>
+                    <!--End mc_embed_signup-->
                 </div>
-                <!--End mc_embed_signup-->
-            </div>
-        </td>
-        <!--<td valign="top">
-            <p>
-                You can also signup using this link: <a href="http://eepurl.com/guNzr" target="_blank">http://eepurl.com/guNzr</a> <br/>
-                You can also signup using this QR code: <br/>
-                <img src="%%PLUGIN_URL%%/zzz_media/qr_code.png" alt="" width="100"/>
-            </p>
-        </td>-->
-    </tr>
-</table>
+            </td>
+            <!--<td valign="top">
+                <p>
+                    You can also signup using this link: <a href="http://eepurl.com/guNzr" target="_blank">http://eepurl.com/guNzr</a> <br/>
+                    You can also signup using this QR code: <br/>
+                    <img src="%%PLUGIN_URL%%/zzz_media/qr_code.png" alt="" width="100"/>
+                </p>
+            </td>-->
+        </tr>
+    </table>
 
     <?php
 }
