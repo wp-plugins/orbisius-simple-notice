@@ -26,6 +26,7 @@ This plugin allows you to show a simple notice to alert your users about server 
 * Supports text and HTML
 * The notice can be shown on top of all content or to push the content down
 * You can choose to show the notice on all pages/posts or on the home page only
+* Optionally show a close button. When a notice is closed/dismissed it won't be shown again until the message is changed or more than 2 days have passed.
 
 == Demo ==
 TODO
@@ -69,6 +70,7 @@ add_filter('orbisius_simple_notice_filter_powered_by', '__return_false', 10);
 * Added an option the notice to push the content down or to stay on top
 * Added a little i icon on the left as a powered by option + option to enable/disable it.
 * Added an option for the user to select to show the notice on all pages or on the home page only
+* The notice can be closed/dismissed
 
 = 1.0.1 =
 * Added a color picker for text, text background color and for links.
