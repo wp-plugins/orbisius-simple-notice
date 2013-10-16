@@ -64,6 +64,8 @@ add_filter('orbisius_simple_notice_filter_powered_by', '__return_false', 10);
 
 = 1.0.2 =
 * Added the old color picker for WordPress installs older than 3.5
+* Added an option the notice to push the content down or to stay on top
+* Added a little i icon on the left as a powered by option + option to enable/disable it.
 
 = 1.0.1 =
 * Added a color picker for text, text background color and for links.

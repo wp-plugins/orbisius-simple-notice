@@ -100,8 +100,12 @@ function orbisius_simple_notice_inject_notice($live_site = 1) {
             . " href='{$data['url']}' class='little_info' target='_blank'>i</a>"
             . "</div>\n";
 
-    // in case if somebody wants to get rid if the feedback link
-    $powered_by_line = apply_filters('orbisius_simple_notice_filter_powered_by', $powered_by_line);
+    if (empty($opts['show_powered_by'])) {
+        $powered_by_line = '';
+    } else {
+        // in case if somebody wants to get rid if the feedback link
+        $powered_by_line = apply_filters('orbisius_simple_notice_filter_powered_by', $powered_by_line);
+    }
 
     $notice = empty($opts['notice']) ? '' : $opts['notice'];
     $text_color = empty($opts['text_color']) ? '#000' : $opts['text_color'];
@@ -252,6 +256,7 @@ function orbisius_simple_notice_validate_settings($input) { // whitelist options
 function orbisius_simple_notice_get_options() {
     $defaults = array(
         'status' => 0,
+        'show_powered_by' => 1,
         'show_in_admin' => 0,
         'show_notice_method' => 'on_top',
         'text_color' => '#555',
@@ -382,6 +387,24 @@ function orbisius_simple_notice_options_page() {
                                                 </label>
                                                 <p>Use this if links don't look good on a selected background.
                                                     <br/>Once you open the color picker, you will need to click outside of it to close it</p>
+                                            </td>
+                                        </tr>
+                                        <tr valign="top">
+                                            <th scope="row">Show Little Powered By Icon</th>
+                                            <td>
+                                                <div>
+                                                    This is the small <strong>i</strong> icon displayed in the far left of the message.
+                                                    We'd appreciate if you leave it enabled.
+                                                </div>
+                                                <label for="show_powered_by_radio1">
+                                                    <input type="radio" id="show_powered_by_radio1" name="orbisius_simple_notice_options[show_powered_by]"
+                                                           value='1' <?php checked(1, $opts['show_powered_by']); ?> /> Enabled
+                                                </label>
+                                                <br/>
+                                                <label for="show_powered_by_radio2">
+                                                    <input type="radio" id="show_powered_by_radio2" name="orbisius_simple_notice_options[show_powered_by]"
+                                                           value='0' <?php checked(0, $opts['show_powered_by']); ?> /> Disabled
+                                                </label>
                                             </td>
                                         </tr>
                                         <tr>
