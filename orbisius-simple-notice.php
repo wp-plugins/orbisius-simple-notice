@@ -55,11 +55,11 @@ function orbisius_simple_notice_add_quick_settings_link($links, $file) {
  * @return type
  */
 function orbisius_simple_notice_init() {
-    $dev = empty($_SERVER['DEV_ENV']) ? 0 : 1;
+    /*$dev = empty($_SERVER['DEV_ENV']) ? 0 : 1;
     $suffix = $dev ? '' : '.min';
 
     wp_register_style('simple_notice', plugins_url("/assets/main{$suffix}.css", __FILE__));
-    wp_enqueue_style('simple_notice');
+    wp_enqueue_style('simple_notice');*/
 
     //$opts = orbisius_simple_notice_get_options();
 }
@@ -132,6 +132,13 @@ function orbisius_simple_notice_inject_notice($live_site = 1) {
     $js_first = '';
 
     if (!empty($live_site)) {
+        // show only on home page
+        if ($opts['show_notice_criteria'] == 'home_page'
+                && ( !is_home() && !is_front_page() ) ) {
+            echo "\n<!-- {$data['name']} | {$data['url']} : selected to be rendered on home page only. Skipping rendering. -->\n";
+            return '';
+        }
+
         if ($opts['show_notice_method'] == 'on_top') {
             $inline_css_arr[] = "top:$top_pos";
             $inline_css_arr[] = "left:$left_pos";
@@ -173,7 +180,7 @@ FORM_EOF;
     }
 
     $form_buff = <<<FORM_EOF
-<!-- orbisius_simple_notice : -->
+<!-- orbisius_simple_notice : {$data['name']} | {$data['url']} -->
 <style>
 .orbisius_simple_notice_container .orbisius_simple_notice {
     $inline_css
@@ -259,6 +266,7 @@ function orbisius_simple_notice_get_options() {
         'show_powered_by' => 1,
         'show_in_admin' => 0,
         'show_notice_method' => 'on_top',
+        'show_notice_criteria' => 'all_pages', // home_page
         'text_color' => '#555',
         'text_bg_color' => '#B4CFD3',
         'link_color' => '',
@@ -333,6 +341,20 @@ function orbisius_simple_notice_options_page() {
                                                     Example: We are going to be doing server maintenance at 9pm today.
                                                     <br/>Example: We have just launched a new product ...
                                                 </p>
+                                            </td>
+                                        </tr>
+                                        <tr valign="top">
+                                            <th scope="row">On which pages to Show the Notice Text</th>
+                                            <td>
+                                                <label for="show_notice_criteria_radio1">
+                                                    <input type="radio" id="show_notice_criteria_radio1" name="orbisius_simple_notice_options[show_notice_criteria]"
+                                                           value='all_pages' <?php checked('all_pages', $opts['show_notice_criteria']); ?> /> On all pages/posts
+                                                </label>
+                                                <br/>
+                                                <label for="show_notice_criteria_radio2">
+                                                    <input type="radio" id="show_notice_criteria_radio2" name="orbisius_simple_notice_options[show_notice_criteria]"
+                                                           value='home_page' <?php checked('home_page', $opts['show_notice_criteria']); ?> /> On Home Page only
+                                                </label>
                                             </td>
                                         </tr>
                                         <tr valign="top">

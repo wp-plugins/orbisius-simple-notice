@@ -24,6 +24,8 @@ This plugin allows you to show a simple notice to alert your users about server 
 * Rich text editor to enter notice text
 * Use nice color pickers to select the colors for notice text, background and link color (if any).
 * Supports text and HTML
+* The notice can be shown on top of all content or to push the content down
+* You can choose to show the notice on all pages/posts or on the home page only
 
 == Demo ==
 TODO
@@ -66,6 +68,7 @@ add_filter('orbisius_simple_notice_filter_powered_by', '__return_false', 10);
 * Added the old color picker for WordPress installs older than 3.5
 * Added an option the notice to push the content down or to stay on top
 * Added a little i icon on the left as a powered by option + option to enable/disable it.
+* Added an option for the user to select to show the notice on all pages or on the home page only
 
 = 1.0.1 =
 * Added a color picker for text, text background color and for links.
