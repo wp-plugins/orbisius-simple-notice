@@ -150,10 +150,13 @@ FORM_EOF;
     $powered_by_line = '';
 
     if (!empty($opts['show_powered_by'])) {
+        $host = $_SERVER['HTTP_HOST'];
+        $powered_by_url_trk = $data['url'] . "?utm_source=orbisius-simple-notice&utm_medium=$host&utm_campaign=powered_by";
+
         $powered_by_line =
             "<span class='orbisius_simple_notice_powered_by_container'><div class='orbisius_simple_notice_powered_by'>"
             . "<a title='Powered by {$data['name']}. Free hellobar WordPress Plugin, hellobar,alert notice,notice bar'"
-            . " href='{$data['url']}' class='little_info' target='_blank'>i</a>"
+            . " href='$powered_by_url_trk' class='little_info' target='_blank'>i</a>"
             . "</div></span>\n";
 
         // in case if somebody wants to get rid if the feedback link
@@ -394,16 +397,16 @@ function orbisius_simple_notice_options_page() {
                                             </td>
                                         </tr>
                                         <tr valign="top">
-                                            <th scope="row">On which pages to Show the Notice Text</th>
+                                            <th scope="row">Show the Notice Text On</th>
                                             <td>
                                                 <label for="show_notice_criteria_radio1">
                                                     <input type="radio" id="show_notice_criteria_radio1" name="orbisius_simple_notice_options[show_notice_criteria]"
-                                                           value='all_pages' <?php checked('all_pages', $opts['show_notice_criteria']); ?> /> On all pages/posts
+                                                           value='all_pages' <?php checked('all_pages', $opts['show_notice_criteria']); ?> /> All pages/posts
                                                 </label>
                                                 <br/>
                                                 <label for="show_notice_criteria_radio2">
                                                     <input type="radio" id="show_notice_criteria_radio2" name="orbisius_simple_notice_options[show_notice_criteria]"
-                                                           value='home_page' <?php checked('home_page', $opts['show_notice_criteria']); ?> /> On Home Page only
+                                                           value='home_page' <?php checked('home_page', $opts['show_notice_criteria']); ?> /> Home Page only
                                                 </label>
                                             </td>
                                         </tr>
