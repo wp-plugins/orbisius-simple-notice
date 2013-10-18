@@ -66,6 +66,9 @@ add_filter('orbisius_simple_notice_filter_powered_by', '__return_false', 10);
 
 == Changelog ==
 
+= 1.0.3 =
+* Added a box that allows the user to select font size
+
 = 1.0.2 =
 * Added the old color picker for WordPress installs older than 3.5
 * Added an option the notice to push the content down or to stay on top

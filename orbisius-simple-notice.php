@@ -185,6 +185,11 @@ FORM_EOF;
         "font-family:arial",
     );
 
+    // does the user want a bigger font?
+    if (!empty($opts['font_size'])) {
+        $inline_css_arr[] = 'font-size:' . $opts['font_size'];
+    }
+
     if (!empty($is_site_front_end)) {
         // show only on home page
         if ($opts['show_notice_criteria'] == 'home_page'
@@ -302,6 +307,11 @@ function orbisius_simple_notice_validate_settings($input) { // whitelist options
     // did the extension break stuff?
     $input = is_array($input_filtered) ? $input_filtered : $input;
 
+    // for font size we want 12px or 14pt
+    if (!empty($input['font_size'])) {
+        $input['font_size'] = preg_replace('#\s#si', '', $input['font_size']);
+    }
+
     return $input;
 }
 
@@ -323,6 +333,7 @@ function orbisius_simple_notice_get_options() {
         'text_color' => '#555',
         'text_bg_color' => '#B4CFD3',
         'link_color' => '',
+        'font_size' => '',
         'notice' => 'We have launched a new product ...',
     );
 
@@ -462,6 +473,16 @@ function orbisius_simple_notice_options_page() {
                                                 </label>
                                                 <p>Use this if links don't look good on a selected background.
                                                     <br/>Once you open the color picker, you will need to click outside of it to close it</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row">Font Size (optional)</th>
+                                            <td>
+                                                <label for="orbisius_simple_notice_options_font_size">
+                                                    <input type="text" id="orbisius_simple_notice_options_font_size" size="7"
+                                                           name="orbisius_simple_notice_options[font_size]"
+                                                           value="<?php echo esc_attr($opts['font_size']); ?>" />
+                                                </label> Example: To change the font enter 14pt or 12px
                                             </td>
                                         </tr>
                                         <tr valign="top">
