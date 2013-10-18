@@ -353,6 +353,7 @@ function orbisius_simple_notice_get_options() {
  */
 function orbisius_simple_notice_options_page() {
     $opts = orbisius_simple_notice_get_options();
+    global $wp_version;
     ?>
     <div id="orbisius_simple_notice_admin_wrapper" class="wrap orbisius_simple_notice_admin_wrapper">
         <h2>Orbisius Simple Notice</h2>
@@ -447,7 +448,9 @@ function orbisius_simple_notice_options_page() {
 
                                                     <div id="text_color_picker"></div> <!-- Used for old WP color picker WP < 3.5 -->
                                                 </label>
-                                                <p>Once you open the color picker, you will need to click outside of it to close it</p>
+                                                <?php if (version_compare($wp_version, '3.5') >= 0) : ?>
+                                                    <p>Once you open the color picker, you will need to click outside of it to close it</p>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                         <tr>
@@ -459,7 +462,9 @@ function orbisius_simple_notice_options_page() {
                                                            value="<?php echo esc_attr($opts['text_bg_color']); ?>" />
                                                     <div id="text_bg_color_picker"></div>
                                                 </label>
-                                                <p>Once you open the color picker, you will need to click outside of it to close it</p>
+                                                <?php if (version_compare($wp_version, '3.5') >= 0) : ?>
+                                                    <p>Once you open the color picker, you will need to click outside of it to close it</p>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                         <tr>
@@ -472,7 +477,10 @@ function orbisius_simple_notice_options_page() {
                                                     <div id="link_color_picker"></div>
                                                 </label>
                                                 <p>Use this if links don't look good on a selected background.
-                                                    <br/>Once you open the color picker, you will need to click outside of it to close it</p>
+                                                    <?php if (version_compare($wp_version, '3.5') >= 0) : ?>
+                                                        <br/>Once you open the color picker, you will need to click outside of it to close it
+                                                    <?php endif; ?>
+                                                </p>
                                             </td>
                                         </tr>
                                         <tr>
@@ -524,7 +532,7 @@ function orbisius_simple_notice_options_page() {
                                             <td>
                                                 <?php echo orbisius_simple_notice_inject_notice(0); ?>
                                                 <div>Save changes to see a new preview.
-                                                    Only in WP admin area: if you click the close button the message will hide and then shown up in 2 seconds.</div>
+                                                    Only in WP admin area: if you click the close button the message will hide and then show up in 2 seconds.</div>
                                             </td>
                                         </tr>
                                         <?php if (0) : ?>

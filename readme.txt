@@ -67,6 +67,10 @@ add_filter('orbisius_simple_notice_filter_powered_by', '__return_false', 10);
 
 == Changelog ==
 
+= 1.0.4 =
+* Showing some instructions only if WP >= 3.5
+* Fixed typos
+
 = 1.0.3 =
 * Added a box that allows the user to select font size
 
