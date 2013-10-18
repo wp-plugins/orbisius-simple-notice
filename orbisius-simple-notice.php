@@ -3,7 +3,7 @@
   Plugin Name: Orbisius Simple Notice
   Plugin URI: http://club.orbisius.com/products/wordpress-plugins/orbisius-simple-notice/
   Description: This plugin allows you to show a simple notice to alert your users about server maintenance, new product launches etc.
-  Version: 1.0.2
+  Version: 1.0.3
   Author: Svetoslav Marinov (Slavi)
   Author URI: http://orbisius.com
  */
@@ -482,7 +482,7 @@ function orbisius_simple_notice_options_page() {
                                                     <input type="text" id="orbisius_simple_notice_options_font_size" size="7"
                                                            name="orbisius_simple_notice_options[font_size]"
                                                            value="<?php echo esc_attr($opts['font_size']); ?>" />
-                                                </label> Example: To change the font enter 14pt or 12px
+                                                </label> Example: To change the font size enter e.g. 14pt, 12px or lower/higher number.
                                             </td>
                                         </tr>
                                         <tr valign="top">
