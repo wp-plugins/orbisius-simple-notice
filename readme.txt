@@ -1,10 +1,9 @@
 === Orbisius Simple Notice ===
-
 Contributors: lordspace,orbisius
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7APYDVPBCSY9A
 Tags: wp,orbisius,notice,alert,hellobar,hello bar,beforesite, heads up, heads up bar, headsup, headsupbar, notification, notification bar, popup, Toolbar
 Requires at least: 2.6
-Tested up to: 3.6.1
+Tested up to: 4.0.1
 Stable tag: 1.0.4
 License: GPLv2 or later
 
@@ -66,6 +65,12 @@ If you don't want to give us credit :( add this line to your functions.php
 add_filter('orbisius_simple_notice_filter_powered_by', '__return_false', 10);
 
 == Changelog ==
+
+= 1.0.5 =
+* Tested with WP 4.0.1
+* Fixed a weird bug that wasn't allowing admins to insert links.
+* Fixed typos
+* Changed 'Save' -> 'Save Changes' so it's more easily clickable.
 
 = 1.0.4 =
 * Showing some instructions only if WP >= 3.5

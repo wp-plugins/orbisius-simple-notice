@@ -3,7 +3,7 @@
   Plugin Name: Orbisius Simple Notice
   Plugin URI: http://club.orbisius.com/products/wordpress-plugins/orbisius-simple-notice/
   Description: This plugin allows you to show a simple notice to alert your users about server maintenance, new product launches etc.
-  Version: 1.0.4
+  Version: 1.0.5
   Author: Svetoslav Marinov (Slavi)
   Author URI: http://orbisius.com
  */
@@ -395,7 +395,12 @@ function orbisius_simple_notice_options_page() {
                                             <td>
                                                 <?php if (1) : ?>
                                                     <?php
-                                                    wp_editor($opts['notice'], "orbisius_simple_notice_options[notice]", array('teeny' => true, 'media_buttons' => false, 'textarea_rows' => 2));
+                                                    wp_editor($opts['notice'], "orbisius_simple_notice_options-notice", array(
+                                                        'teeny' => true,
+                                                        'media_buttons' => false,
+                                                        'textarea_rows' => 2,
+                                                        'textarea_name' => 'orbisius_simple_notice_options[notice],'
+                                                    ));
                                                     ?>
                                                 <?php else : // simple editor ?>
                                                     <input type="text" id="orbisius_simple_notice_options_notice" class="widefat"
@@ -555,7 +560,7 @@ function orbisius_simple_notice_options_page() {
                                     </table>
 
                                     <p class="submit">
-                                        <input type="submit" class="button-primary" value="<?php _e('Save') ?>" />
+                                        <input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
                                     </p>
                                 </form>
                             </div> <!-- .inside -->
@@ -586,6 +591,8 @@ function orbisius_simple_notice_options_page() {
                             </div> <!-- .inside -->
                         </div> <!-- .postbox -->
 
+                        <?php orbisius_simple_notice_widget::output_widget(); ?>
+
                         <div class="postbox">
                             <h3><span>Donation</span></h3>
                             <div class="inside">
@@ -604,39 +611,10 @@ function orbisius_simple_notice_options_page() {
                         </div> <!-- .postbox -->
 
                         <div class="postbox">
-                            <h3><span>Want to see more products of ours? </span></h3>
-                            <div class="inside">
-                                <p>
-                                    Go to <a href="http://club.orbisius.com/products/" target="_blank"
-                                             title="Opens a page with the pugins we developed. [New Window/Tab]">http://club.orbisius.com/products/</a>.
-                                </p>
-                            </div> <!-- .inside -->
-                        </div> <!-- .postbox -->
-
-                        <div class="postbox">
                             <h3><span>Support & Feature Requests</span></h3>
                             <div class="inside">
                                 Support is handled on our site: <a href="http://club.orbisius.com/support/?utm_source=orbisius-simple-notice&utm_medium=settings-top-bar&utm_campaign=plugin-update" target="_blank" title="[new window]">http://club.orbisius.com/support/</a>.
                                 Please do NOT use the WordPress forums or other places to seek support.
-                            </div> <!-- .inside -->
-                        </div> <!-- .postbox -->
-
-                        <div class="postbox">
-                            <h3><span>About the Author</span></h3>
-                            <div class="inside">
-                                <p>
-                                    <a href="http://slavi.biz/linkedin" target="_blank" title="Click to see Slavi's linkedin profile. Opens in a new tab/window">
-                                        <img width="64" height="64" class="avatar avatar-64 photo" alt="" style="float: left;padding-right: 3px;"
-                                             src="http://1.gravatar.com/avatar/fd5bd959efce7d8c5c40518276bb3998?s=64&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D64&amp;r=G" /></a>
-
-                                    This plugin was created by Svetoslav Marinov (Slavi),
-                                    Founder of <a href="http://orbisius.com/?utm_source=orbisius-simple-notice&utm_medium=plugin-settings-about&utm_campaign=plugin-update" target="_blank">orbisius.com</a>.
-                                    Connect with him on <a href="http://slavi.biz/linkedin" target="_blank"
-                                                           title="Click to see Slavi's linkedin profile. Opens in a new tab/window">Linkedin</a>
-                                    and
-                                    <a href="http://slavi.biz/twitter" target="_blank"
-                                       title="Click to see Slavi's twitter profile. Opens in a new tab/window">Twitter</a>.
-                                </p>
                             </div> <!-- .inside -->
                         </div> <!-- .postbox -->
 
@@ -790,4 +768,43 @@ function orbisius_simple_notice_add_plugin_credits() {
     $name = $plugin_data['name'];
 
     printf(PHP_EOL . PHP_EOL . '<!-- ' . "Powered by $name | URL: $url " . '-->' . PHP_EOL . PHP_EOL);
+}
+
+/**
+ * Orbisius Widget
+ */
+class orbisius_simple_notice_widget {
+    /**
+     * Loads news from Club Orbsius Site.
+     * <?php orbisius_simple_notice_widget::output_widget(); ?>
+     * <?php orbisius_simple_notice_widget::output_widget('author'); ?>
+     */
+    public static function output_widget($obj = '', $return = 0) {
+        $buff = '';
+        ?>
+        <!-- Orbisius JS Widget -->
+            <?php
+                $naked_domain = !empty($_SERVER['DEV_ENV']) ? 'orbclub.com.clients.com' : 'club.orbisius.com';
+
+                if (!empty($_SERVER['DEV_ENV']) && is_ssl()) {
+                    $naked_domain = 'ssl.orbisius.com/club';
+                }
+
+				// obj could be 'author'
+                $obj = empty($obj) ? str_replace('.php', '', basename(__FILE__)) : sanitize_title($obj);
+                $obj_id = 'orb_widget_' . sha1($obj);
+
+                $params = '?' . http_build_query(array('p' => $obj, 't' => $obj_id, 'layout' => 'plugin', ));
+                $buff .= "<div id='$obj_id' class='$obj_id orbisius_ext_content'></div>\n";
+                $buff .= "<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://$naked_domain/wpu/widget/$params';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'orbsius-js-$obj_id');</script>";
+            ?>
+            <!-- /Orbisius JS Widget -->
+        <?php
+
+        if ($return) {
+            return $buff;
+        } else {
+            echo $buff;
+        }
+    }
 }
