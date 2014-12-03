@@ -574,53 +574,205 @@ function orbisius_simple_notice_options_page() {
                 <div id="postbox-container-1" class="postbox-container">
 
                     <div class="meta-box-sortables">
-                        <div class="postbox">
-                            <h3><span>Free Quote | Hire Us</span></h3>
-                            <div class="inside">
-                                Do you need any Programming (web/mobile app) or WordPress work (custom themes/plugins, speed/security improvements).
 
-                                <br/><a href='http://orbisius.com/page/free-quote/?utm_source=orbisius-simple-notice&utm_medium=plugin-settings-about&utm_campaign=plugin-update'
-                                        target="_blank" class="button-primary">Get a Free Quote</a>
+                        <div class="postbox">
+                            <h3><span>Hire Us</span></h3>
+                            <div class="inside">
+                                Hire us to create a plugin/web/mobile app for your business.
+                                <br/><a href="http://orbisius.com/page/free-quote/?utm_source=orbisius-child-theme-creator&utm_medium=plugin-settings&utm_campaign=product"
+                                   title="If you want a custom web/mobile app/plugin developed contact us. This opens in a new window/tab"
+                                    class="button-primary" target="_blank">Get a Free Quote</a>
                             </div> <!-- .inside -->
                         </div> <!-- .postbox -->
 
                         <div class="postbox">
                             <h3><span>Newsletter</span></h3>
                             <div class="inside">
-                                <?php echo orbisius_simple_notice_generate_newsletter_box(); ?>
+                                <!-- Begin MailChimp Signup Form -->
+                                <div id="mc_embed_signup">
+                                    <?php
+                                        $current_user = wp_get_current_user();
+                                        $email = empty($current_user->user_email) ? '' : $current_user->user_email;
+                                    ?>
+
+                                    <form action="http://WebWeb.us2.list-manage.com/subscribe/post?u=005070a78d0e52a7b567e96df&amp;id=1b83cd2093" method="post"
+                                          id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank">
+                                        <input type="hidden" value="settings" name="SRC2" />
+                                        <input type="hidden" value="orbisius-child-theme-creator" name="SRC" />
+
+                                        <span>Get notified about cool plugins we release</span>
+                                        <!--<div class="indicates-required"><span class="app_asterisk">*</span> indicates required
+                                        </div>-->
+                                        <div class="mc-field-group">
+                                            <label for="mce-EMAIL">Email <span class="app_asterisk">*</span></label>
+                                            <input type="email" value="<?php echo esc_attr($email); ?>" name="EMAIL" class="required email" id="mce-EMAIL">
+                                        </div>
+                                        <div id="mce-responses" class="clear">
+                                            <div class="response" id="mce-error-response" style="display:none"></div>
+                                            <div class="response" id="mce-success-response" style="display:none"></div>
+                                        </div>	<div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button-primary"></div>
+                                    </form>
+                                </div>
+                                <!--End mc_embed_signup-->
                             </div> <!-- .inside -->
                         </div> <!-- .postbox -->
 
                         <?php orbisius_simple_notice_widget::output_widget(); ?>
 
+                        <?php
+                                        $plugin_data = get_plugin_data(__FILE__);
+                                        $product_name = trim($plugin_data['Name']);
+                                        $product_page = trim($plugin_data['PluginURI']);
+                                        $product_descr = trim($plugin_data['Description']);
+                                        $product_descr_short = substr($product_descr, 0, 50) . '...';
+
+                                        $base_name_slug = basename(__FILE__);
+                                        $base_name_slug = str_replace('.php', '', $base_name_slug);
+                                        $product_page .= (strpos($product_page, '?') === false) ? '?' : '&';
+                                        $product_page .= "utm_source=$base_name_slug&utm_medium=plugin-settings&utm_campaign=product";
+
+                                        $product_page_tweet_link = $product_page;
+                                        $product_page_tweet_link = str_replace('plugin-settings', 'tweet', $product_page_tweet_link);
+                                    ?>
+
                         <div class="postbox">
-                            <h3><span>Donation</span></h3>
                             <div class="inside">
-                                Donations help us dedicate more resources to improve this and create new plugins.
+                                <!-- Twitter: code -->
+                                <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="http://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+                                <!-- /Twitter: code -->
+
+                                <!-- Twitter: Orbisius_Follow:js -->
+                                    <a href="https://twitter.com/orbisius" class="twitter-follow-button"
+                                       data-align="right" data-show-count="false">Follow @orbisius</a>
+                                <!-- /Twitter: Orbisius_Follow:js -->
+
+                                &nbsp;
+
+                                <!-- Twitter: Tweet:js -->
+                                <a href="https://twitter.com/share" class="twitter-share-button"
+                                   data-lang="en" data-text="Checkout <?php echo esc_attr($product_name); ?> #WordPress #plugin."
+                                   data-count="none" data-via="orbisius" data-related="orbisius"
+                                   data-url="<?php echo $product_page_tweet_link;?>">Tweet</a>
+                                <!-- /Twitter: Tweet:js -->
+
 
                                 <br/>
-                                <!--<a href='http://orbisius.com/page/donate/?utm_source=orbisius-simple-notice&utm_medium=plugin-settings-about&utm_campaign=plugin-update'
-                                   target="_blank" class="button-primary">Donate</a>-->
+                                 <a href="<?php echo $product_page; ?>" target="_blank" title="[new window]">Product Page</a>
+                                    |
+                                <span>Support: <a href="http://club.orbisius.com/forums/forum/community-support-forum/wordpress-plugins/orbisius-child-theme-creator/?utm_source=orbisius-child-theme-creator&utm_medium=plugin-settings&utm_campaign=product"
+                                    target="_blank" title="[new window]">Forums</a>
 
-                                <a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7APYDVPBCSY9A'
-                                   target="_blank" class="button-primary">Donate</a>
+                                    <!--|
+                                     <a href="http://docs.google.com/viewer?url=https%3A%2F%2Fdl.dropboxusercontent.com%2Fs%2Fwz83vm9841lz3o9%2FOrbisius_LikeGate_Documentation.pdf" target="_blank">Documentation</a>
+                                    -->
+                                </span>
+                            </div>
 
-                                | <a href='http://orbisius.com/page/why-donate/?utm_source=orbisius-simple-notice&utm_medium=plugin-settings-about&utm_campaign=plugin-update'
-                                     target="_blank">Why Donate</a>
-                            </div> <!-- .inside -->
-                        </div> <!-- .postbox -->
-
-                        <div class="postbox">
-                            <h3><span>Support & Feature Requests</span></h3>
+                            <h3><span>Troubleshooting</span></h3>
                             <div class="inside">
-                                Support is handled on our site: <a href="http://club.orbisius.com/support/?utm_source=orbisius-simple-notice&utm_medium=settings-top-bar&utm_campaign=plugin-update" target="_blank" title="[new window]">http://club.orbisius.com/support/</a>.
-                                Please do NOT use the WordPress forums or other places to seek support.
-                            </div> <!-- .inside -->
+                                If your site becomes broken because of a child theme check:
+                                <a href="http://club.orbisius.com/products/wordpress-plugins/orbisius-theme-fixer/?utm_source=orbisius-child-theme-creator&utm_medium=settings_troubleshooting&utm_campaign=product"
+                                target="_blank" title="[new window]">Orbisius Theme Fixer</a>
+                            </div>
                         </div> <!-- .postbox -->
+
+
+                        <div class="postbox"> <!-- quick-contact -->
+                            <?php
+                            $current_user = wp_get_current_user();
+                            $email = empty($current_user->user_email) ? '' : $current_user->user_email;
+                            $quick_form_action = is_ssl()
+                                    ? 'https://ssl.orbisius.com/apps/quick-contact/'
+                                    : 'http://apps.orbisius.com/quick-contact/';
+
+                            if (!empty($_SERVER['DEV_ENV'])) {
+                                $quick_form_action = 'http://localhost/projects/quick-contact/';
+                            }
+                            ?>
+                            <script>
+                                var octc_quick_contact = {
+                                    validate_form : function () {
+                                        try {
+                                            var msg = jQuery('#octc_msg').val().trim();
+                                            var email = jQuery('#octc_email').val().trim();
+
+                                            email = email.replace(/\s+/, '');
+                                            email = email.replace(/\.+/, '.');
+                                            email = email.replace(/\@+/, '@');
+
+                                            if ( msg == '' ) {
+                                                alert('Enter your message.');
+                                                jQuery('#octc_msg').focus().val(msg).css('border', '1px solid red');
+                                                return false;
+                                            } else {
+                                                // all is good clear borders
+                                                jQuery('#octc_msg').css('border', '');
+                                            }
+
+                                            if ( email == '' || email.indexOf('@') <= 2 || email.indexOf('.') == -1) {
+                                                alert('Enter your email and make sure it is valid.');
+                                                jQuery('#octc_email').focus().val(email).css('border', '1px solid red');
+                                                return false;
+                                            } else {
+                                                // all is good clear borders
+                                                jQuery('#octc_email').css('border', '');
+                                            }
+
+                                            return true;
+                                        } catch(e) {};
+                                    }
+                                };
+                            </script>
+                            <h3><span>Quick Question or Suggestion</span></h3>
+                            <div class="inside">
+                                <div>
+                                    <form method="post" action="<?php echo $quick_form_action; ?>" target="_blank">
+                                        <?php
+                                            global $wp_version;
+											$plugin_data = get_plugin_data(__FILE__);
+
+                                            $hidden_data = array(
+                                                'site_url' => site_url(),
+                                                'wp_ver' => $wp_version,
+                                                'first_name' => $current_user->first_name,
+                                                'last_name' => $current_user->last_name,
+                                                'product_name' => $plugin_data['Name'],
+                                                'product_ver' => $plugin_data['Version'],
+                                                'woocommerce_ver' => defined('WOOCOMMERCE_VERSION') ? WOOCOMMERCE_VERSION : 'n/a',
+                                            );
+                                            $hid_data = http_build_query($hidden_data);
+                                            echo "<input type='hidden' name='data[sys_info]' value='$hid_data' />\n";
+                                        ?>
+                                        <textarea class="widefat" id='octc_msg' name='data[msg]' required="required"></textarea>
+                                        <br/>Your Email: <input type="text" class=""
+                                               id="octc_email" name='data[sender_email]' placeholder="Email" required="required"
+                                               value="<?php echo esc_attr($email); ?>"
+                                               />
+                                        <br/><input type="submit" class="button-primary" value="<?php _e('Send Feedback') ?>"
+                                                    onclick="return octc_quick_contact.validate_form();" />
+                                        <br/>
+                                        What data will be sent
+                                        <a href='javascript:void(0);'
+                                            onclick='jQuery(".octc_data_to_be_sent").toggle();'>(show/hide)</a>
+                                        <div class="hide app_hide octc_data_to_be_sent">
+                                            <textarea class="widefat" rows="4" readonly="readonly" disabled="disabled"><?php
+                                            foreach ($hidden_data as $key => $val) {
+                                                if (is_array($val)) {
+                                                    $val = var_export($val, 1);
+                                                }
+
+                                                echo "$key: $val\n";
+                                            }
+                                            ?></textarea>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div> <!-- .inside -->
+                         </div> <!-- .postbox --> <!-- /quick-contact -->
 
                     </div> <!-- .meta-box-sortables -->
 
-                </div> <!-- #postbox-container-1 .postbox-container -->
+                </div> <!-- #postbox-container-1 .postbox-container sidebar -->
 
             </div> <!-- #post-body .metabox-holder .columns-2 -->
 
@@ -682,12 +834,7 @@ function orbisius_simple_notice_options_page() {
     </p>
     <!-- /share -->
 
-    <?php
-    $plugin_slug = basename(__FILE__);
-    $plugin_slug = str_replace('.php', '', $plugin_slug);
-    ?>
-    <iframe style="width:100%;min-height:300px;height: auto;" width="640" height="480"
-            src="http://club.orbisius.com/wpu/content/wp/<?php echo $plugin_slug; ?>/" frameborder="0" allowfullscreen></iframe>
+    <?php orbisius_simple_notice_widget::output_widget('author'); ?>
 
     </div>
     <?php
