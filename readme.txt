@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: wp,orbisius,notice,alert,hellobar,hello bar,beforesite, heads up, heads up bar, headsup, headsupbar, notification, notification bar, popup, Toolbar
 Requires at least: 2.6
 Tested up to: 4.0.1
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPLv2 or later
 
 This plugin allows you to show a simple notice to alert your users about server maintenance, new product launches etc.
@@ -65,6 +65,9 @@ If you don't want to give us credit :( add this line to your functions.php
 add_filter('orbisius_simple_notice_filter_powered_by', '__return_false', 10);
 
 == Changelog ==
+
+= 1.0.6 =
+* Replacing any shortcodes used in the notice box.
 
 = 1.0.5 =
 * Tested with WP 4.0.1

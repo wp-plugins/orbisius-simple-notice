@@ -3,7 +3,7 @@
   Plugin Name: Orbisius Simple Notice
   Plugin URI: http://club.orbisius.com/products/wordpress-plugins/orbisius-simple-notice/
   Description: This plugin allows you to show a simple notice to alert your users about server maintenance, new product launches etc.
-  Version: 1.0.5
+  Version: 1.0.6
   Author: Svetoslav Marinov (Slavi)
   Author URI: http://orbisius.com
  */
@@ -225,6 +225,7 @@ FORM_EOF;
     }
 
     $msg_id = 'orb_ntc_'. md5($notice);
+    $notice = do_shortcode($notice);
 
     $form_buff = <<<FORM_EOF
 <!-- orbisius_simple_notice : {$data['name']} | {$data['url']} -->
@@ -575,15 +576,17 @@ function orbisius_simple_notice_options_page() {
 
                     <div class="meta-box-sortables">
 
+                        <!-- Hire Us -->
                         <div class="postbox">
                             <h3><span>Hire Us</span></h3>
                             <div class="inside">
-                                Hire us to create a plugin/web/mobile app for your business.
-                                <br/><a href="http://orbisius.com/page/free-quote/?utm_source=orbisius-child-theme-creator&utm_medium=plugin-settings&utm_campaign=product"
+                                Hire us to create a plugin/web/mobile app
+                                <br/><a href="http://orbisius.com/page/free-quote/?utm_source=<?php echo str_replace('.php', '', basename(__FILE__));?>&utm_medium=plugin-settings&utm_campaign=product"
                                    title="If you want a custom web/mobile app/plugin developed contact us. This opens in a new window/tab"
                                     class="button-primary" target="_blank">Get a Free Quote</a>
                             </div> <!-- .inside -->
                         </div> <!-- .postbox -->
+                        <!-- /Hire Us -->
 
                         <div class="postbox">
                             <h3><span>Newsletter</span></h3>
