@@ -3,7 +3,7 @@
   Plugin Name: Orbisius Simple Notice
   Plugin URI: http://club.orbisius.com/products/wordpress-plugins/orbisius-simple-notice/
   Description: This plugin allows you to show a simple notice to alert your users about server maintenance, new product launches etc.
-  Version: 1.0.6
+  Version: 1.0.7
   Author: Svetoslav Marinov (Slavi)
   Author URI: http://orbisius.com
  */
@@ -95,8 +95,9 @@ function orbisius_simple_notice_inject_notice($is_site_front_end = 1) {
 
     // The user doesn't want to show the notice.
     // This applies only for the live site.
-    if (empty($opts['status']) && !empty($is_site_front_end)) {
-        echo "\n<!-- {$data['name']} | {$data['url']} : is disabled. Skipping rendering. -->\n";
+    if ( (empty($opts['status']) && !empty($is_site_front_end))
+			|| defined( 'DOING_AJAX' ) ) {
+		echo "\n<!-- {$data['name']} | {$data['url']} : is disabled or it's an ajax call. Skipping rendering. -->\n";
         return;
     }
 
